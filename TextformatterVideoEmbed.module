@@ -33,6 +33,7 @@ class TextformatterVideoEmbed extends Textformatter implements ConfigurableModul
 	protected static $configDefaults = array(
 		'maxWidth' => 640, 
 		'maxHeight' => 480,
+		'related' => 1,
 		'responsive' => 0,
 		); 
 
@@ -143,8 +144,9 @@ class TextformatterVideoEmbed extends Textformatter implements ConfigurableModul
 
 			$videoID = $matches[2][$key]; 
 			$queryString = isset($matches[3][$key]) ? $matches[3][$key] : '';
+			if(!$this->related) $queryString .= 'rel=0';
 			$embedCode = $this->getEmbedCode($oembedURL, $videoID); 
-
+			
 			if($embedCode) {
 				if(strlen($queryString)) {
 					$queryString = str_replace('&amp;', '&', $queryString);
@@ -194,7 +196,7 @@ class TextformatterVideoEmbed extends Textformatter implements ConfigurableModul
 
 		unset($data['cacheClear']);
 		$inputfields = new InputfieldWrapper();
-
+		
 		$f = wire('modules')->get('InputfieldInteger'); 
 		$f->attr('name', 'maxWidth');
 		$f->attr('value', $data['maxWidth']); 
@@ -205,15 +207,23 @@ class TextformatterVideoEmbed extends Textformatter implements ConfigurableModul
 		$f->attr('name', 'maxHeight');
 		$f->attr('value', $data['maxHeight']); 
 		$f->label = __('Max Video Height'); 
-		$inputfields->add($f); 
+		$inputfields->add($f);
 
+		$f = wire('modules')->get('InputfieldCheckbox'); 
+		$f->attr('name', 'related');
+		$f->attr('value', 1); 
+		if($data['related']) $f->attr('checked', 'checked'); 
+		$f->label = __('Related videos?'); 
+		$f->description = __('When checked, related videos will be shown.');
+		$inputfields->add($f); 		
+		
 		$f = wire('modules')->get('InputfieldCheckbox'); 
 		$f->attr('name', 'responsive');
 		$f->attr('value', 1); 
 		if($data['responsive']) $f->attr('checked', 'checked'); 
 		$f->label = __('Use Responsive Embed Method?'); 
 		$f->description = __('When checked, videos will be embedded in a manner that allows them to be presented in a width-flexible format.'); 
-		$inputfields->add($f); 
+		$inputfields->add($f);
 
 		if(wire('input')->post('clearCache')) {
 			wire('db')->query("DELETE FROM " . self::dbTableName); 
