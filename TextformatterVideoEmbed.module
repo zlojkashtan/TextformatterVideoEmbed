@@ -147,7 +147,7 @@ class TextformatterVideoEmbed extends Textformatter implements ConfigurableModul
 
 			$videoID = $matches[2][$key];
 			if(!$this->related) $queryString = 'rel=0'; 
-			$queryString = isset($matches[3][$key]) ? $matches[3][$key] : '';
+			$queryString .= isset($matches[3][$key]) ? $matches[3][$key] : '';
 			$embedCode = $this->getEmbedCode($oembedURL, $videoID); 
 
 			if($embedCode) {
